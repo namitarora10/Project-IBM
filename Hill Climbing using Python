@@ -1,0 +1,54 @@
+import itertools
+
+def calculate_distance(tour, distances):
+    total_distance = 0
+    for i in range(len(tour) - 1):
+        total_distance += distances[tour[i]][tour[i + 1]]
+    total_distance += distances[tour[-1]][tour[0]]  # Return to the starting city
+    return total_distance
+
+def generate_neighbors(tour):
+    # Generate all possible 2-opt neighbors
+    neighbors = []
+    for i in range(1, len(tour) - 1):
+        for j in range(i + 1, len(tour)):
+            neighbor = tour[:i] + tour[i:j + 1][::-1] + tour[j + 1:]
+            neighbors.append(neighbor)
+    return neighbors
+
+def hill_climbing(initial_tour, distances):
+    current_tour = initial_tour
+    current_distance = calculate_distance(current_tour, distances)
+
+    while True:
+        neighbors = generate_neighbors(current_tour)
+        best_neighbor = min(neighbors, key=lambda x: calculate_distance(x, distances))
+        if calculate_distance(best_neighbor, distances) < current_distance:
+            current_tour = best_neighbor
+            current_distance = calculate_distance(current_tour, distances)
+        else:
+            break
+
+    return current_tour, current_distance
+
+# Example usage:
+if _name_ == "__main__":
+    # Example distance matrix (replace this with your own)
+    distances = [
+        [0, 10, 15, 20],
+        [10, 0, 35, 25],
+        [15, 35, 0, 30],
+        [20, 25, 30, 0]
+    ]
+
+    # Number of cities
+    num_cities = len(distances)
+
+    # Generate an initial tour (e.g., [0, 1, 2, ..., num_cities-1])
+    initial_tour = list(range(num_cities))
+
+    # Run hill climbing
+    final_tour, final_distance = hill_climbing(initial_tour, distances)
+
+    print("Final Tour:", final_tour)
+    print("Final Distance:", final_distance)
